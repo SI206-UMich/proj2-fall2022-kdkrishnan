@@ -111,7 +111,7 @@ def write_csv(data, filename):
 
     This function should not return anything.
     """
-    base_path = os.path.abspath(os.path.dirname(__file__))
+    '''base_path = os.path.abspath(os.path.dirname(__file__))
     full_path = os.path.join(base_path, filename)
     
     with open(full_path, 'w', newline='') as f:
@@ -124,7 +124,7 @@ def write_csv(data, filename):
         sort = sorted(data, key = lambda x: x[2])
    
         for item in sort:
-            writer.writerow(item)
+            writer.writerow(item)'''
     pass
 
 
@@ -178,11 +178,12 @@ class TestCases(unittest.TestCase):
         # check that the variable you saved after calling the function is a list
         self.assertEqual(type(listings), list)
         # check that each item in the list is a tuple
-
+        for i in range(20):
+            self.assertEqual(type(listings[i]), tuple)
         # check that the first title, cost, and listing id tuple is correct (open the search results html and find it)
-
+        self.assertEqual(listings[0], ('Loft in Mission District', 210, '1944564'))
         # check that the last title is correct (open the search results html and find it)
-        pass
+        self.assertEqual(listings[-1],('Guest suite in Mission District', 238, '32871760'))
 
     def test_get_listing_information(self):
         html_list = ["1623609",
