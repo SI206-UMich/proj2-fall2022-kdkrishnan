@@ -25,7 +25,24 @@ def get_listings_from_search_results(html_file):
         ('Loft in Mission District', 210, '1944564'),  # example
     ]
     """
-    pass
+    source_dir = os.path.dirname(__file__)
+    full_path = os.path.join(source_dir, html_file)
+    with open(full_path) as f:
+        soup = BeautifulSoup(f, "html.parser")
+
+        prices = soup.find_all('span', class_ = "_tyxjp1")
+        titles = soup.find_all('div', class_="t1jojoys dir dir-ltr")
+
+        listings = []
+        for i in range(len(prices)):
+            price = prices[i].get_text()
+            price = price.strip("$")
+            title = titles[i].get_text()
+            num = titles[i].get('id', None)
+            num = num.strip("title_")
+            temp = (title, int(price), num)
+            listings.append(temp)
+        return listings
 
 
 def get_listing_information(listing_id):
@@ -94,6 +111,20 @@ def write_csv(data, filename):
 
     This function should not return anything.
     """
+    base_path = os.path.abspath(os.path.dirname(__file__))
+    full_path = os.path.join(base_path, filename)
+    
+    with open(full_path, 'w', newline='') as f:
+   
+        writer = csv.writer(f)
+    
+        #writing first row
+        header = ["Listing Title", "Cost", "Listing ID", "Policy Number", "Place Type", "Number of Bedrooms"]
+        writer.writerow(header)
+        sort = sorted(data, key = lambda x: x[2])
+   
+        for item in sort:
+            writer.writerow(item)
     pass
 
 
