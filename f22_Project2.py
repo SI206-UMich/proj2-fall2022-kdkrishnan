@@ -25,9 +25,9 @@ def get_listings_from_search_results(html_file):
         ('Loft in Mission District', 210, '1944564'),  # example
     ]
     """
-    source_dir = os.path.dirname(__file__)
-    full_path = os.path.join(source_dir, html_file)
-    with open(full_path) as f:
+    #source_dir = os.path.dirname(__file__)
+    #full_path = os.path.join(source_dir, html_file)
+    with open(html_file) as f:
         soup = BeautifulSoup(f, "html.parser")
 
         prices = soup.find_all('span', class_ = "_tyxjp1")
@@ -69,7 +69,46 @@ def get_listing_information(listing_id):
         number of bedrooms
     )
     """
-    pass
+    #we are returning one tuple at a time
+    path = "html_files/listing_"+listing_id + ".html"
+    with open(path, encoding="utf-8") as fh:
+        data = fh.read()
+        soup = BeautifulSoup(data, 'html.parser')
+        
+        #get policy
+        policies = soup.find('li', class_ = "f19phm7j dir dir-ltr")
+        policies = policies.find('span').text
+        if "pending" in policies.lower():
+            policy = "Pending"
+        elif "exempt" in policies.lower():
+            policy = "Exempt"
+        else:
+            policy = policies
+
+        #get place type
+        room = soup.find('h2', class_ = "_14i3z6h")
+        room = room.text
+        if "private" in room.lower():
+            roomType = "Private Room"
+        elif "shared" in room.lower():
+            roomType = "Shared Room"
+        else:
+            roomType = "Entire Room"
+        
+        #get number rooms
+        numRooms = soup.find('div', class_ = "_tqmy57")
+        numRooms = numRooms.find_all('li', class_ = "l7n4lsf dir dir-ltr")
+        #numRooms = numRooms.find('span', class_ = "s1b4clln dir dir-ltr")
+        roomH = numRooms[1].find_all('span')
+        roomH = roomH[2].text
+        if "studio" in roomH.lower():
+            beds = 1
+        else:
+            roomH = roomH.split()
+            beds = int(roomH[0])
+        
+        outInfo = (policy, roomType, beds)
+        return outInfo
 
 
 def get_detailed_listing_database(html_file):
@@ -86,7 +125,22 @@ def get_detailed_listing_database(html_file):
         ...
     ]
     """
-    pass
+    allTups = get_listings_from_search_results(html_file)
+    #source_path = os.path.dirname(__file__)
+    #full_path = os.path.join(source_path, html_file)
+    with open(html_file) as fh:
+        soup = BeautifulSoup(fh, 'html.parser')
+        titles= soup.find_all('div', class_ = "t1jojoys dir dir-ltr")
+        
+        OutTupleList= []
+        for i in range(len(titles)):
+            title = titles[i].get_text()
+            lstNum = titles[i].get('id', None)
+            lstNum = lstNum.strip("title_")
+            listingInfo = get_listing_information(lstNum)
+            tuppy = allTups[i] + listingInfo
+            OutTupleList.append(tuppy)
+        return OutTupleList      
 
 
 def write_csv(data, filename):
@@ -111,7 +165,7 @@ def write_csv(data, filename):
 
     This function should not return anything.
     """
-    '''base_path = os.path.abspath(os.path.dirname(__file__))
+    base_path = os.path.abspath(os.path.dirname(__file__))
     full_path = os.path.join(base_path, filename)
     
     with open(full_path, 'w', newline='') as f:
@@ -124,7 +178,7 @@ def write_csv(data, filename):
         sort = sorted(data, key = lambda x: x[2])
    
         for item in sort:
-            writer.writerow(item)'''
+            writer.writerow(item)
     pass
 
 
