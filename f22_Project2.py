@@ -1,3 +1,8 @@
+# Your name: Kiran Krishnan
+# Your student id: 94999919
+# Your email: kirandk@umich.edu
+# List who you have worked with on this project: Abigail Finn, Jacob Hays
+
 from xml.sax import parseString
 from bs4 import BeautifulSoup
 import re
